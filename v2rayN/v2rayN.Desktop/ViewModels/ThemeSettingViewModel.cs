@@ -119,11 +119,15 @@ public partial class ThemeSettingViewModel : MyReactiveObject
 
         try
         {
-            Application.Current!.Resources["AppFontFamily"] = currentFontFamily;
+            // The resource is consumed by TextElement.FontFamily through a DynamicResource,
+            // so it must be a FontFamily instance rather than the raw config string.
+            Application.Current!.Resources["AppFontFamily"] = new FontFamily(currentFontFamily);
         }
         catch (Exception ex)
         {
             Logging.SaveLog("ModifyFontFamily", ex);
+            // Fall back to the default font instead of leaving an invalid value behind.
+            Application.Current?.Resources.Remove("AppFontFamily");
         }
     }
 }
